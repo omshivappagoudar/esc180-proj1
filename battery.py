@@ -18,13 +18,16 @@ def duration_fast_charge_possible():
     pass
 
 def get_cur_temp():
-    pass
+    global get_cur_temp
+    return get_cur_temp
 
 def get_cur_charge():
-    pass
+    global cur_charge 
+    return cur_charge
 
 def get_cur_battery_health():
-    pass
+    global good_battery_health
+    return good_battery_health
 
 def charge_time_needed(minutes):
     pass
