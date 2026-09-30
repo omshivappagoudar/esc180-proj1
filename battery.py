@@ -11,21 +11,43 @@ def initialize():
     cur_time = 0
     good_battery_health = True
 
+def global_var_initializer(): # this function initializes the global variables at the start of each function
+    global cur_temp # in degrees Celsius
+    global cur_charge # in percentage points
+    global cur_time # in minutes
+    global good_battery_health # boolean
+
 def simulate_activity(activity, duration):
     pass
 
-def duration_fast_charge_possible():
-    pass
+def duration_fast_charge_possible(): # checks the duration fast charging is possible
+    global_var_initializer()
+    temp = cur_temp
+    charge = cur_charge
 
-def get_cur_temp():
+    if !good_battery_health:
+        return 0
+
+    possible = (charge < 80) and (temp < 40)
+    duration = 0
+
+    while possible:
+        temp += 0.5
+        charge += 3
+        possible = (charge < 80) and (temp < 40)
+
+    return duration
+    
+
+def get_cur_temp(): # returns the current temperature of the battery (float)
     global get_cur_temp
     return get_cur_temp
 
-def get_cur_charge():
+def get_cur_charge(): # returns the current charge of the battery(float)
     global cur_charge 
     return cur_charge
 
-def get_cur_battery_health():
+def get_cur_battery_health(): # returns whether the battery is in good health or no (boolean)
     global good_battery_health
     return good_battery_health
 
