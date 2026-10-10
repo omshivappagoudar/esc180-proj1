@@ -56,21 +56,21 @@ def simulate_activity(activity, duration):
         if fast_charging_time > duration:
             fast_charging_time = duration
 
-        while fast_charging_time > 0:
-            cur_time += 1
-            cur_charge += 3 
-            cur_temp += 0.5 
-            duration -= 1   
-            fast_charging_time -= 1
+        cur_time += 1 * fast_charging_time
+        cur_charge += 3 * fast_charging_time
+        cur_temp += 0.5 * fast_charging_time
+        duration -= 1 * fast_charging_time
         
         overcharge_recorded = False
         
         while duration > 0 and good_battery_health:
 
-            cur_charge = min(100.0, cur_charge + 1)
-            cur_temp += 0.25 
-            cur_time += 1
-            duration -= 1
+            step = min(1.0, duration)
+
+            cur_charge = min(100.0, cur_charge + 1 * step)
+            cur_temp += 0.25 * step
+            cur_time += 1 * step
+            duration -= 1 * step
 
             if not overcharge_recorded and cur_charge >= 90:
                 overcharge_recorded = True
@@ -79,16 +79,18 @@ def simulate_activity(activity, duration):
 
         while duration > 0 and not good_battery_health:
 
+            step = min(1.0, duration)
+
             if cur_charge <= 80:
-                cur_time += 1
-                cur_charge = min(80.0, cur_charge + 1)
-                cur_temp += 0.25 
-                duration -= 1  
+                cur_time += 1 * step
+                cur_charge = min(80.0, cur_charge + 1 * step)
+                cur_temp += 0.25 * step
+                duration -= 1 * step
 
             else:
-                cur_time += 1
-                cur_temp += 0.25 
-                duration -= 1                
+                cur_time += 1 * step
+                cur_temp += 0.25 * step
+                duration -= 1 * step
 
     if activity == 'use':
 
@@ -136,13 +138,13 @@ def duration_fast_charge_possible(): # checks the duration fast charging is poss
         return 0
     
     possible = (charge < 80) and (0 <= temp <= 40)
-    duration = 0
+    if not possible:
+        return 0
+
+    limit_from_charge = (80 - charge) / 3
+    limit_from_temp = (40 - temp) / 0.5
    
-    while possible:
-        temp += 0.5
-        charge += 3
-        possible = (charge < 80) and (0 <= temp <= 40)
-        duration += 1
+    duration = min(limit_from_charge, limit_from_temp)
         
     return duration
     
