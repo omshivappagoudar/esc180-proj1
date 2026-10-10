@@ -11,8 +11,8 @@ def initialize():
 
     cur_time = 0
     good_battery_health = True
-    cur_temp = 20
-    cur_charge = 50 #cur_charge < 101
+    cur_temp = 20.0
+    cur_charge = 50.0 #cur_charge < 101
     overcharges = []
 
 
@@ -62,28 +62,20 @@ def simulate_activity(activity, duration):
             cur_temp += 0.5 
             duration -= 1   
             fast_charging_time -= 1
-
+        
+        overcharge_recorded = False
+        
         while duration > 0 and good_battery_health:
 
-            overcharge_recorded = False
-
-            if cur_charge >= 100:
-                cur_time += 1
-                cur_temp += 0.25 
-                duration -= 1 
-                continue
+            cur_charge = min(100.0, cur_charge + 1)
+            cur_temp += 0.25 
+            cur_time += 1
+            duration -= 1
 
             if not overcharge_recorded and cur_charge >= 90:
                 overcharge_recorded = True
                 update_overcharges()
                 update_battery_health()
-
-            cur_time += 1
-            cur_charge = min(100.0, cur_charge + 1)
-            cur_temp += 0.25 
-            duration -= 1  
-
-            
 
         while duration > 0 and not good_battery_health:
 
@@ -92,6 +84,7 @@ def simulate_activity(activity, duration):
                 cur_charge = min(80.0, cur_charge + 1)
                 cur_temp += 0.25 
                 duration -= 1  
+
             else:
                 cur_time += 1
                 cur_temp += 0.25 
@@ -167,7 +160,34 @@ def get_cur_battery_health(): # returns whether the battery is in good health or
     return good_battery_health
 
 def charge_time_needed(minutes):
-    pass
+
+    global cur_temp # in degrees Celsius
+    global cur_charge # in percentage points
+    global cur_time # in minutes
+    global good_battery_health # boolean
+    global overcharges # stores overcharges in minutes
+
+    duration = 0
+    charge_needed = (minutes * 2) - cur_charge
+
+    if cur_charge >= minutes * 2:
+        return duration
+
+    fast_charging_time = duration_fast_charge_possible()
+
+    while fast_charging_time > 0 and charge_needed > 0:
+        charge_needed -= 3
+        fast_charging_time -= 1
+        duration += 1
+
+        if charge_needed <= 0:
+            return duration
+
+    while charge_needed > 0:
+        charge_needed -= 1
+        duration += 1
+
+    return duration
 
 if __name__ == '__main__':
     initialize()
