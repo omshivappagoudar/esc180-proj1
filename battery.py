@@ -172,6 +172,12 @@ def charge_time_needed(minutes):
     duration = 0
     charge_needed = (minutes * 2) - cur_charge
 
+    if minutes * 2 > 100:
+        return None
+
+    if minutes * 2 > 80 and not good_battery_health:
+        return None
+
     if cur_charge >= minutes * 2:
         return duration
 
